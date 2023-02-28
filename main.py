@@ -10,6 +10,19 @@
 а также составить собственную программу и решить с шагом интегрирования h_int = 0.1
 2) Используя метод Рунге-Кутты 3-й степени точности
 """
+import numpy as np
+from scipy.integrate import ode
+from matplotlib import pyplot
+
+
+def rkf45(f, T, X0):
+    """
+    Solves `x' = f(t, x)` for each `t` in `T`
+    with initial values of `X0`.
+    """
+    runge = ode(f).set_integrator('dopri5').set_initial_value(X0, T[0])
+    X = [X0, *[runge.integrate(T[i]) for i in range(1, len(T))]]
+    return X
 
 
 def main():
