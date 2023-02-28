@@ -17,12 +17,27 @@ from matplotlib import pyplot
 
 def rkf45(f, T, X0):
     """
-    Solves `x' = f(t, x)` for each `t` in `T`
-    with initial values of `X0`.
+    Решает `x' = f(t, x)` для каждого `t` в `T`
+    С начальным значением `X0`, используя аналог rkf45
     """
-    runge = ode(f).set_integrator('dopri5').set_initial_value(X0, T[0])
-    X = [X0, *[runge.integrate(T[i]) for i in range(1, len(T))]]
-    return X
+    runge = ode(f).set_integrator('dopri5', atol=0.0001).set_initial_value(X0, T[0])
+    X = np.array([X0, *[runge.integrate(T[i]) for i in range(1, len(T))]])
+    return X[:, 0]
+
+
+def Runge_Kutta(f, T, X0):
+    """
+    Решает `x' = f(t, x)` для каждого `t` в `T`
+    С начальным значением `X0`, используя формулы Рунге-Кутты 3 степени
+    """
+    X = [X0]
+    h = T[1] - T[0]
+    for i in range(0, len(T) - 1):
+        k_1 = h * f(T[i], X[i])
+        k_2 = h * f(T[i] + h / 2, X[i] + k_1 / 2)
+        k_3 = h * f(T[i] + 3 * h / 4, X[i] + 3 * k_2 / 4)
+        X.append(X[i] + (2 * k_1 + 3 * k_2 + 4 * k_3) / 9)
+    return X[:, 0]
 
 
 def main():
