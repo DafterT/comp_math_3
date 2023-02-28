@@ -14,6 +14,7 @@ import numpy as np
 from scipy.integrate import ode
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import prettytable as pt
 
 
 def rkf45(f, T, X0):
@@ -60,33 +61,33 @@ def g(T):
 
 
 # Функция для отрисовки одного графика
-def print_one_graph(x, y, title, id, count_graphs):
+def print_one_graph(t, y, title, id, count_graphs):
     plt.subplot(1, count_graphs, id)
-    plt.xlabel('x')
+    plt.xlabel('t')
     plt.ylabel('y')
     plt.grid()
     plt.title(title)
-    plt.plot(x, y, '-o')
+    plt.plot(t, y, '-o')
 
 
 # Функция для отрисовки всех графиков
-def print_graph(x_find, y_real, y_RKF45, y_Runge_Kutta, h):
+def print_graph(t_find, y_real, y_RKF45, y_Runge_Kutta, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
-    print_one_graph(x_find, y_real, 'Исходный график', 1, 3)
-    print_one_graph(x_find, y_RKF45, 'График RKF45', 2, 3)
-    print_one_graph(x_find, y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
+    print_one_graph(t_find, y_real, 'Исходный график', 1, 3)
+    print_one_graph(t_find, y_RKF45, 'График RKF45', 2, 3)
+    print_one_graph(t_find, y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
     plt.savefig(f"Graphs_{h}.jpg")
     plt.show()
 
 
 # Функция для отрисовки погрешности
-def print_error_graph(x_find, y_real, y_RKF45, y_Runge_Kutta, h):
+def print_error_graph(t_find, y_real, y_RKF45, y_Runge_Kutta, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     # Собственно сам график
-    print_one_graph(x_find, y_real - y_RKF45, 'Погрешность RKF45', 1, 2)
-    print_one_graph(x_find, y_real - y_Runge_Kutta, 'Погрешность Рунге-Кутты', 2, 2)
+    print_one_graph(t_find, y_real - y_RKF45, 'Погрешность RKF45', 1, 2)
+    print_one_graph(t_find, y_real - y_Runge_Kutta, 'Погрешность Рунге-Кутты', 2, 2)
     plt.savefig(f"Error_{h}.jpg")
     plt.show()
 
@@ -98,15 +99,16 @@ def evaluate(h):
     # Начальные значения
     X0 = np.array([np.e ** 2, 2 * np.e ** 2])
     # Значения в узлах
-    X = np.arange(1, 2 + h, h)
-    Y = g(X)
+    T = np.arange(1, 2 + h, h)
+    Y = g(T)
     # Расчет RKF45
-    Y_rkf45 = rkf45(f, X, X0)
+    Y_RKF45 = rkf45(f, T, X0)
     # Расчет Рунге-Кутты
-    Y_Runge_Kutta = Runge_Kutta(f, X, X0)
+    Y_Runge_Kutta = Runge_Kutta(f, T, X0)
     # Рисуем графики
-    print_graph(X, Y, Y_rkf45, Y_Runge_Kutta, h)
-    print_error_graph(X, Y, Y_rkf45, Y_Runge_Kutta, h)
+    print_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
+    print_error_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
+    # Выводим данные в консоль
 
 
 def main():
