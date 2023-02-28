@@ -70,24 +70,24 @@ def print_one_graph(x, y, title, id, count_graphs):
 
 
 # Функция для отрисовки всех графиков
-def print_graph(x_find, y_real, y_RKF45, y_Runge_Kutta):
+def print_graph(x_find, y_real, y_RKF45, y_Runge_Kutta, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     print_one_graph(x_find, y_real, 'Исходный график', 1, 3)
     print_one_graph(x_find, y_RKF45, 'График RKF45', 2, 3)
     print_one_graph(x_find, y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
-    plt.savefig("Graphs.jpg")
+    plt.savefig(f"Graphs_{h}.jpg")
     plt.show()
 
 
 # Функция для отрисовки погрешности
-def print_error_graph(x_find, y_real, y_RKF45, y_Runge_Kutta):
+def print_error_graph(x_find, y_real, y_RKF45, y_Runge_Kutta, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     # Собственно сам график
     print_one_graph(x_find, y_real - y_RKF45, 'Погрешность RKF45', 1, 2)
     print_one_graph(x_find, y_real - y_Runge_Kutta, 'Погрешность Рунге-Кутты', 2, 2)
-    plt.savefig("Error.jpg")
+    plt.savefig(f"Error_{h}.jpg")
     plt.show()
 
 
@@ -95,25 +95,25 @@ def evaluate(h):
     """
     Получение решения при разных шагах
     """
-    # Промежуток
-    a = 1
-    b = 2
     # Начальные значения
     X0 = np.array([np.e ** 2, 2 * np.e ** 2])
     # Значения в узлах
-    X = np.arange(a, b + h, h)
+    X = np.arange(1, 2 + h, h)
     Y = g(X)
     # Расчет RKF45
     Y_rkf45 = rkf45(f, X, X0)
     # Расчет Рунге-Кутты
     Y_Runge_Kutta = Runge_Kutta(f, X, X0)
     # Рисуем графики
-    print_graph(X, Y, Y_rkf45, Y_Runge_Kutta)
-    print_error_graph(X, Y, Y_rkf45, Y_Runge_Kutta)
+    print_graph(X, Y, Y_rkf45, Y_Runge_Kutta, h)
+    print_error_graph(X, Y, Y_rkf45, Y_Runge_Kutta, h)
 
 
 def main():
-    evaluate(0.1)
+    h = 0.1
+    for i in range(4):
+        evaluate(h)
+        h /= 2
 
 
 if __name__ == '__main__':
