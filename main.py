@@ -12,7 +12,8 @@
 """
 import numpy as np
 from scipy.integrate import ode
-from matplotlib import pyplot
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
 def rkf45(f, T, X0):
@@ -46,8 +47,8 @@ def f(t, X):
     Правая часть `x' = f(t, x)`.
     """
     dX = np.zeros(X.shape)
-    dX[0] = (t + 1) / t * X[0] + 2 * (t - 1) / t * X[1]
-    dX[1] = X[0]
+    dX[0] = X[1]
+    dX[1] = (t + 1) / t * X[1] + 2 * (t - 1) / t * X[0]
     return dX
 
 
@@ -58,8 +59,61 @@ def g(T):
     return np.e ** (2 * T)
 
 
+# Функция для отрисовки одного графика
+def print_one_graph(x, y, title, id, count_graphs):
+    plt.subplot(1, count_graphs, id)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.grid()
+    plt.title(title)
+    plt.plot(x, y, '-o')
+
+
+# Функция для отрисовки всех графиков
+def print_graph(x_find, y_real, y_RKF45, y_Runge_Kutta):
+    mpl.use('TkAgg')
+    plt.figure(figsize=(15, 4))
+    print_one_graph(x_find, y_real, 'Исходный график', 1, 3)
+    print_one_graph(x_find, y_RKF45, 'График RKF45', 2, 3)
+    print_one_graph(x_find, y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
+    plt.savefig("Graphs.jpg")
+    plt.show()
+
+
+# Функция для отрисовки погрешности
+def print_error_graph(x_find, y_real, y_RKF45, y_Runge_Kutta):
+    mpl.use('TkAgg')
+    plt.figure(figsize=(15, 4))
+    # Собственно сам график
+    print_one_graph(x_find, y_real - y_RKF45, 'Погрешность RKF45', 1, 2)
+    print_one_graph(x_find, y_real - y_Runge_Kutta, 'Погрешность Рунге-Кутты', 2, 2)
+    plt.savefig("Error.jpg")
+    plt.show()
+
+
+def evaluate(h):
+    """
+    Получение решения при разных шагах
+    """
+    # Промежуток
+    a = 1
+    b = 2
+    # Начальные значения
+    X0 = np.array([np.e ** 2, 2 * np.e ** 2])
+    # Значения в узлах
+    X = np.arange(a, b + h, h)
+    Y = g(X)
+    # Расчет RKF45
+    Y_rkf45 = rkf45(f, X, X0)
+    # Расчет Рунге-Кутты
+    Y_Runge_Kutta = Runge_Kutta(f, X, X0)
+    # Рисуем графики
+    print_graph(X, Y, Y_rkf45, Y_Runge_Kutta)
+    print_error_graph(X, Y, Y_rkf45, Y_Runge_Kutta)
+
+
 def main():
-    pass
+    evaluate(0.1)
 
 
 if __name__ == '__main__':
