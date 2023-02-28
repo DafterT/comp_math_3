@@ -14,7 +14,7 @@ import numpy as np
 from scipy.integrate import ode
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import prettytable as pt
+from prettytable import PrettyTable
 
 
 def rkf45(f, T, X0):
@@ -92,6 +92,20 @@ def print_error_graph(t_find, y_real, y_RKF45, y_Runge_Kutta, h):
     plt.show()
 
 
+# Функция для отрисовки таблицы
+def print_table(t_find, y_real, Y_RKF45, Y_Runge_Kutta, h):
+    print(f'h = {h}')
+    koef = {0.1: 1, 0.05: 2, 0.025: 4, 0.0125: 8}.get(h)
+    pt = PrettyTable()
+    pt.add_column('t', [f'{i:.1f}' for i in t_find[::koef]])
+    pt.add_column('real y', [f'{i:.15f}' for i in y_real[::koef]])
+    pt.add_column('RKF45 y', [f'{i:.15f}' for i in Y_RKF45[::koef]])
+    pt.add_column('Delta RKF45 y', [f'{i:.15f}' for i in (y_real - Y_RKF45)[::koef]])
+    pt.add_column('Runge Kutta y', [f'{i:.15f}' for i in Y_Runge_Kutta[::koef]])
+    pt.add_column('Delta Runge Kutta y', [f'{i:.15f}' for i in (y_real - Y_Runge_Kutta)[::koef]])
+    print(pt)
+
+
 def evaluate(h):
     """
     Получение решения при разных шагах
@@ -109,6 +123,7 @@ def evaluate(h):
     print_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
     print_error_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
     # Выводим данные в консоль
+    print_table(T, Y, Y_RKF45, Y_Runge_Kutta, h)
 
 
 def main():
