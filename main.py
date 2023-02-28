@@ -71,39 +71,45 @@ def print_one_graph(t, y, title, id, count_graphs):
 
 
 # Функция для отрисовки всех графиков
-def print_graph(t_find, y_real, y_RKF45, y_Runge_Kutta, h):
+def print_graph(t_find, y_real, Y_RKF45, Y_Runge_Kutta, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     print_one_graph(t_find, y_real, 'Исходный график', 1, 3)
-    print_one_graph(t_find, y_RKF45, 'График RKF45', 2, 3)
-    print_one_graph(t_find, y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
+    print_one_graph(t_find, Y_RKF45, 'График RKF45', 2, 3)
+    print_one_graph(t_find, Y_Runge_Kutta, 'График Рунге-Кутты', 3, 3)
     plt.savefig(f"Graphs_{h}.jpg")
     plt.show()
 
 
 # Функция для отрисовки погрешности
-def print_error_graph(t_find, y_real, y_RKF45, y_Runge_Kutta, h):
+def print_error_graph(t_find, Y_RKF45_error, Y_Runge_Kutta_error, h):
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     # Собственно сам график
-    print_one_graph(t_find, y_real - y_RKF45, 'Погрешность RKF45', 1, 2)
-    print_one_graph(t_find, y_real - y_Runge_Kutta, 'Погрешность Рунге-Кутты', 2, 2)
+    print_one_graph(t_find, Y_RKF45_error, 'Погрешность RKF45', 1, 2)
+    print_one_graph(t_find, Y_Runge_Kutta_error, 'Погрешность Рунге-Кутты', 2, 2)
     plt.savefig(f"Error_{h}.jpg")
     plt.show()
 
 
 # Функция для отрисовки таблицы
-def print_table(t_find, y_real, Y_RKF45, Y_Runge_Kutta, h):
+def print_table(t_find, y_real, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_Kutta_error, h):
     print(f'h = {h}')
     koef = {0.1: 1, 0.05: 2, 0.025: 4, 0.0125: 8}.get(h)
     pt = PrettyTable()
     pt.add_column('t', [f'{i:.1f}' for i in t_find[::koef]])
     pt.add_column('real y', [f'{i:.15f}' for i in y_real[::koef]])
     pt.add_column('RKF45 y', [f'{i:.15f}' for i in Y_RKF45[::koef]])
-    pt.add_column('Delta RKF45 y', [f'{i:.15f}' for i in (y_real - Y_RKF45)[::koef]])
+    pt.add_column('Delta RKF45 y', [f'{i:.15f}' for i in Y_RKF45_error[::koef]])
     pt.add_column('Runge Kutta y', [f'{i:.15f}' for i in Y_Runge_Kutta[::koef]])
-    pt.add_column('Delta Runge Kutta y', [f'{i:.15f}' for i in (y_real - Y_Runge_Kutta)[::koef]])
+    pt.add_column('Delta Runge Kutta y', [f'{i:.15f}' for i in Y_Runge_Kutta_error[::koef]])
     print(pt)
+    print('First step of RKF45:', Y_RKF45_error[1])
+    print('First step of Runge Kutta:', Y_Runge_Kutta_error[1])
+    print('Global of RKF45:', Y_RKF45_error.sum())
+    print('Global of Runge Kutta:', Y_Runge_Kutta_error.sum())
+    print('h^4 is about:', h ** 4)
+    print('h^4 / Runge Kutta first step:', h ** 4 / Y_Runge_Kutta_error[1])
 
 
 def evaluate(h):
@@ -119,11 +125,14 @@ def evaluate(h):
     Y_RKF45 = rkf45(f, T, X0)
     # Расчет Рунге-Кутты
     Y_Runge_Kutta = Runge_Kutta(f, T, X0)
+    # Погрешности
+    Y_RKF45_error = Y - Y_RKF45
+    Y_Runge_Kutta_error = Y - Y_Runge_Kutta
     # Рисуем графики
     print_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
-    print_error_graph(T, Y, Y_RKF45, Y_Runge_Kutta, h)
+    print_error_graph(T, Y_RKF45_error, Y_Runge_Kutta_error, h)
     # Выводим данные в консоль
-    print_table(T, Y, Y_RKF45, Y_Runge_Kutta, h)
+    print_table(T, Y, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_Kutta_error, h)
 
 
 def main():
