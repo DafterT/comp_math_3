@@ -118,6 +118,7 @@ def print_table(t_find, y_real, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_K
     print('Global of Runge Kutta:', Y_Runge_Kutta_error.sum())
     print('h^4 is about:', h ** 4)
     print('h^4 / Runge Kutta first step:', h ** 4 / Y_Runge_Kutta_error[1])
+    print('=' * 110)
 
 
 def evaluate(h):
