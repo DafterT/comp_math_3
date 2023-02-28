@@ -60,8 +60,10 @@ def g(T):
     return np.e ** (2 * T)
 
 
-# Функция для отрисовки одного графика
 def print_one_graph(t, y, title, id, count_graphs):
+    """
+    Функция для отрисовки одного графика
+    """
     plt.subplot(1, count_graphs, id)
     plt.xlabel('t')
     plt.ylabel('y')
@@ -70,8 +72,10 @@ def print_one_graph(t, y, title, id, count_graphs):
     plt.plot(t, y, '-o')
 
 
-# Функция для отрисовки всех графиков
 def print_graph(t_find, y_real, Y_RKF45, Y_Runge_Kutta, h):
+    """
+    Функция для отрисовки всех графиков
+    """
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     print_one_graph(t_find, y_real, 'Исходный график', 1, 3)
@@ -81,8 +85,10 @@ def print_graph(t_find, y_real, Y_RKF45, Y_Runge_Kutta, h):
     plt.show()
 
 
-# Функция для отрисовки погрешности
 def print_error_graph(t_find, Y_RKF45_error, Y_Runge_Kutta_error, h):
+    """
+    Функция для отрисовки погрешности
+    """
     mpl.use('TkAgg')
     plt.figure(figsize=(15, 4))
     # Собственно сам график
@@ -92,8 +98,10 @@ def print_error_graph(t_find, Y_RKF45_error, Y_Runge_Kutta_error, h):
     plt.show()
 
 
-# Функция для отрисовки таблицы
 def print_table(t_find, y_real, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_Kutta_error, h):
+    """
+    Функция для отрисовки таблицы
+    """
     print(f'h = {h}')
     koef = {0.1: 1, 0.05: 2, 0.025: 4, 0.0125: 8}.get(h)
     pt = PrettyTable()
