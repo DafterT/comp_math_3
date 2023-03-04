@@ -142,13 +142,40 @@ def evaluate(h):
     print_error_graph(T, Y_RKF45_error, Y_Runge_Kutta_error, h)
     # Выводим данные в консоль
     print_table(T, Y, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_Kutta_error, h)
+    return Y_RKF45_error, Y_Runge_Kutta_error
+
+
+def print_table_error(Y_RKF45_error, Y_Runge_Kutta_error, h_list):
+    pt = PrettyTable()
+    pt.add_column('h', [f'{i:.4f}' for i in h_list])
+    pt.add_column("Runge Kutta Error local", [f'{i[1]:.15f}' for i in Y_Runge_Kutta_error])
+    pt.add_column('h**4 / Runge Kutta Error local',
+                  [f'{i ** 4 / j[1]:.15f}' for i, j in zip(h_list, Y_Runge_Kutta_error)])
+    print(pt)
+    pt.clear()
+    pt.add_column('h', [f'{i:.4f}' for i in h_list])
+    pt.add_column("Runge Kutta Error global", [f'{i.sum():.15f}' for i in Y_Runge_Kutta_error])
+    pt.add_column('h**2 / Runge Kutta Error global',
+                  [f'{i ** 2 / j.sum():.15f}' for i, j in zip(h_list, Y_Runge_Kutta_error)])
+    print(pt)
+    pt.clear()
+    pt.add_column('h', [f'{i:.4f}' for i in h_list])
+    pt.add_column("RKF45 Error local", [f'{i[1]:.15f}' for i in Y_RKF45_error])
+    pt.add_column("RKF45 Error global", [f'{i.sum():.15f}' for i in Y_RKF45_error])
+    pt.add_column("Runge Kutta Error local", [f'{i[1]:.15f}' for i in Y_Runge_Kutta_error])
+    pt.add_column("Runge Kutta Error global", [f'{i.sum():.15f}' for i in Y_Runge_Kutta_error])
+    print(pt)
 
 
 def main():
-    h = 0.1
-    for i in range(4):
-        evaluate(h)
-        h /= 2
+    h_list = [0.1 / (2 ** i) for i in range(4)]
+    Y_RKF45_error = []
+    Y_Runge_Kutta_error = []
+    for h in h_list:
+        error = evaluate(h)
+        Y_RKF45_error.append(error[0])
+        Y_Runge_Kutta_error.append(error[1])
+    print_table_error(Y_RKF45_error, Y_Runge_Kutta_error, h_list)
 
 
 if __name__ == '__main__':
