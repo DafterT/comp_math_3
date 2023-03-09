@@ -24,10 +24,10 @@ def rkf45(f, T, X0):
     """
     runge = ode(f).set_integrator('dopri5', atol=0.0001).set_initial_value(X0, T[0])
     X = [X0, *[runge.integrate(T[i]) for i in range(1, len(T))]]
-    return np.array([i[0] for i in X])
+    return np.array([i[0] for i in X]), np.array([i[1] for i in X])
 
 
-def Runge_Kutta(f, T, X0):
+def RK3(f, T, X0):
     """
     Решает `x' = f(t, x)` для каждого `t` в `T`
     С начальным значением `X0`, используя формулы Рунге-Кутты 3 степени
@@ -118,6 +118,15 @@ def print_table(t_find, y_real, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_K
     print('Global of Runge Kutta:', Y_Runge_Kutta_error.sum())
     print('h^4 is about:', h ** 4)
     print('h^4 / Runge Kutta first step:', h ** 4 / Y_Runge_Kutta_error[1])
+
+
+def print_additiontal_research(T, Y_derivative_real, Y_derivative_RKF45):
+    pt = PrettyTable()
+    pt.add_column("T", [f'{i:.4f}' for i in T])
+    pt.add_column("Y' real", Y_derivative_real)
+    pt.add_column("Y' RKF45", Y_derivative_RKF45)
+    pt.add_column("Y' delta", Y_derivative_real - Y_derivative_RKF45)
+    print(pt)
     print('=' * 110)
 
 
@@ -131,9 +140,9 @@ def evaluate(h):
     T = np.arange(1, 2 + h, h)
     Y = g(T)
     # Расчет RKF45
-    Y_RKF45 = rkf45(f, T, X0)
+    Y_RKF45, Y_derivative_RKF45 = rkf45(f, T, X0)
     # Расчет Рунге-Кутты
-    Y_Runge_Kutta = Runge_Kutta(f, T, X0)
+    Y_Runge_Kutta = RK3(f, T, X0)
     # Погрешности
     Y_RKF45_error = Y - Y_RKF45
     Y_Runge_Kutta_error = Y - Y_Runge_Kutta
@@ -142,6 +151,8 @@ def evaluate(h):
     print_error_graph(T, Y_RKF45_error, Y_Runge_Kutta_error, h)
     # Выводим данные в консоль
     print_table(T, Y, Y_RKF45, Y_RKF45_error, Y_Runge_Kutta, Y_Runge_Kutta_error, h)
+    # Вывод для дополнительных исследований
+    print_additiontal_research(T, 2 * (np.e ** (2 * T)), Y_derivative_RKF45)
     return Y_RKF45_error, Y_Runge_Kutta_error
 
 
